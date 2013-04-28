@@ -51,7 +51,7 @@ void main( int argc, char **argv) {
   
   // Testing non-System function calls
   Stat nonSysFuncStat;
-  char* nonSystFuncName = "Non-System Function Benchmark";
+  char* nonSysFuncName = "Non-System Function Benchmark";
   nonSysFuncStat.testName = nonSysFuncName;
   nonSysFuncBench(&nonSysFuncStat);
 
