@@ -1,5 +1,5 @@
 /*
-Jeremy Bernstein
+Jeremy Bernstein and Travis Price
 CS 481 Spring 2013
 Lab 4 - OS Benchmarking
 */
