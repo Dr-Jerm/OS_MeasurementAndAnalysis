@@ -30,14 +30,34 @@ int tinyFunc(){
 // Benchmark for non-System Function calls
 void nonSysFuncBench(Stat* stat){
   stat->startTime = timeNanoSec(&timer);
-  printf("startTime: %lluns\n", stat->startTime);
+  
+  int i;
+  for (i = 0; i < conf.iterations; i++){
+    long long unsigned startF = timeNanoSec(&timer);
+    tinyFunc();
+    stat->totalDelta += timeNanoSec(&timer) - startF;
+  }
+
+  stat->endTime = timeNanoSec(&timer);
+  printStats(stat, &conf);
 }
 
+void sysFuncBench(Stat* stat){
+
+}
 
 void main( int argc, char **argv) {
   conf.iterations = 1000000;
-
+  
+  // Testing non-System function calls
   Stat nonSysFuncStat;
+  char* nonSystFuncName = "Non-System Function Benchmark";
+  nonSysFuncStat.testName = nonSysFuncName;
   nonSysFuncBench(&nonSysFuncStat);
-  printf("up and running\n");
+
+  // Testing System function calls
+  Stat sysFuncStat;
+  char* sysFuncName = "Non-System Function Benchmark";
+  sysFuncStat.testName = sysFuncName;
+  sysFuncBench(&sysFuncStat);
 }

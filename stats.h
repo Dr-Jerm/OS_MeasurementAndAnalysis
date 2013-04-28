@@ -12,6 +12,7 @@ typedef struct {
 } Conf;
 
 typedef struct {
+  char* testName;
   long long unsigned startTime;
   long long unsigned endTime;
 
@@ -19,3 +20,14 @@ typedef struct {
   long long unsigned avDelta;
 
 } Stat;
+
+void printStats(Stat* stat, Conf* conf) {
+  printf("Test: %s\n_____________\n", stat->testName); 
+
+  printf("Iterations: %d\n", conf->iterations);
+  printf("Start time: %lluns\n", stat->startTime);
+  printf("End time: %lluns\n", stat->endTime);
+
+  printf("Average time per test: %fns/test\n", stat->totalDelta /(float) conf->iterations);
+}
+
