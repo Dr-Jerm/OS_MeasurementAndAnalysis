@@ -1,0 +1,14 @@
+# Compiled Source #
+###################
+os_bench
+ipc_mp_bench
+ipc_shmem_bench
+io_bench
+
+*.o
+
+# Vim Metadata #
+################
+*.swp
+*.swo
+.nfs*
