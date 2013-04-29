@@ -56,6 +56,40 @@ void sysFuncBench(Stat* stat){
   stat->endTime = timeNanoSec(&timer);
 }
 
+// Tiny struct to hold pthread input args
+typedef struct{
+  Stat* stat;
+  long long unsigned* startF;
+} Args;
+
+// Tiny function to time thread creation
+void *threadBench(Args* args){
+  args->stat->totalDelta+= timeNanoSec(&timer) - *(args->startF);
+  pthread_exit(NULL);
+}
+
+// Benchmark for Thread Creation
+void createThreadBench(Stat* stat){
+  stat->startTime = timeNanoSec(&timer);
+  
+  int i;
+  for (i = 0; i < conf.iterations; i++){
+    Args args;
+    args.stat = stat;
+
+    long long unsigned startF = timeNanoSec(&timer);
+    pthread_t thread;
+    void *threadBench(Args* args);
+    args.startF = &startF;
+
+    pthread_create(&thread, NULL, threadBench, &args);
+    pthread_join(thread, NULL);
+//    stat->totalDelta += timeNanoSec(&timer) - startF;
+  }
+
+  stat->endTime = timeNanoSec(&timer);
+}
+
 // Benchmark for Process Creation
 void createProcessBench(Stat* stat){
   stat->startTime = timeNanoSec(&timer);
@@ -102,9 +136,19 @@ void main( int argc, char **argv) {
   printStats(sysFuncStat, &conf);
   free(sysFuncStat);
 
-  conf.iterations = 1000;
+   conf.iterations = 5000;
   // Testing process creation
-  Stat* createProcessStat = malloc(sizeof(Stat));;
+  Stat* createThreadStat = malloc(sizeof(Stat));
+  char* createThreadName = "Thread Creation Benchmark";
+  createThreadStat->testName = createThreadName;
+  createThreadBench(createThreadStat);
+  printStats(createThreadStat, &conf);
+  free(createThreadStat);
+
+
+  conf.iterations = 5000;
+  // Testing process creation
+  Stat* createProcessStat = malloc(sizeof(Stat));
   char* createProcessName = "Process Creation Benchmark";
   createProcessStat->testName = createProcessName;
   createProcessBench(createProcessStat);
