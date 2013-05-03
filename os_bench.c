@@ -173,14 +173,27 @@ void switchProcessBench(Stat* stat){
 pthread_cond_t cond;
 pthread_mutex_t mutex;
 
-// Tiny struct to hold pthread input args
-typedef struct{
-  Stat* stat;
-  long long unsigned* startF;
-} Args;
+int running = 1;
+int tSleep = 1;
+long long unsigned tStart;
 
 // Tiny thread to test context switches with
-void *threadSwitchBench(){
+void *threadSwitchBench(Stat* stat){
+
+  cpu_set_t mask;
+  CPU_ZERO(&mask);
+  CPU_SET(0, &mask);
+  sched_setaffinity(0, sizeof(mask), &mask);
+
+  while(running){
+    pthread_mutex_lock(&mutex);
+    while(tSleep)
+      pthread_cond_wait(&cond, &mutex);
+    stat->totalDelta += timeNanoSec(&timer) - tStart;
+    tSleep = 1;
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&mutex);
+  }
   pthread_exit(NULL);
 }
 
@@ -188,23 +201,29 @@ void *threadSwitchBench(){
 void switchThreadBench(Stat* stat){
   stat->startTime = timeNanoSec(&timer);
 
+  cpu_set_t mask;
+  CPU_ZERO(&mask);
+  CPU_SET(0, &mask);
+  sched_setaffinity(0, sizeof(mask), &mask);
+
   pthread_t thread;
+  void *threadSwitchBench();
 
-  pthread_create(&thread, NULL, threadSwitchBench, NULL);
+  pthread_create(&thread, NULL, threadSwitchBench, stat);
 
-  
   int i;
   for (i = 0; i < conf.iterations; i++){
-
-    long long unsigned startF = timeNanoSec(&timer);
-    pthread_t thread;
-    void *threadBench();
-
-    pthread_create(&thread, NULL, threadBench, NULL);
-    stat->totalDelta += timeNanoSec(&timer) - startF;
-    pthread_join(thread, NULL);
+    pthread_mutex_lock(&mutex);
+    while(!tSleep)
+      pthread_cond_wait(&cond, &mutex);
+    tSleep = 0;
+    tStart = timeNanoSec(&timer);
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&mutex);
   }
+  running = 0;
 
+  pthread_join(thread, NULL);
   stat->endTime = timeNanoSec(&timer);
 }
 
@@ -221,69 +240,64 @@ void main( int argc, char **argv) {
   switch(test) {
     case 0: // RUN ALL
      
-    case 1:
-      ;// Testing non-System function calls
+    case 1:;
+      char* nonSysFuncName = "Non-System Function Benchmark";
       Stat* nonSysFuncStat = malloc(sizeof(Stat));
       nonSysFuncStat-> totalDelta = 0;
-      char* nonSysFuncName = "Non-System Function Benchmark";
       nonSysFuncStat->testName = nonSysFuncName;
       nonSysFuncBench(nonSysFuncStat);
       printStats(nonSysFuncStat, &conf);
       free(nonSysFuncStat);
       if ( test > 0 ){ break; }
 
-    case 2:
-      ;// Testing System function calls
+    case 2:;
+      char* sysFuncName = "System Function Benchmark";
       Stat* sysFuncStat = malloc(sizeof(Stat));
       sysFuncStat->totalDelta = 0;
-      char* sysFuncName = "System Function Benchmark";
       sysFuncStat->testName = sysFuncName;
       sysFuncBench(sysFuncStat);
       printStats(sysFuncStat, &conf);
       free(sysFuncStat);
       if ( test > 0 ){ break; }
 
-    case 3:
-      conf.iterations = 10000;
-      ;// Testing process creation
+    case 3:;
+      char* createThreadName = "Thread Creation Benchmark";
+      conf.iterations = 100000;
       Stat* createThreadStat = malloc(sizeof(Stat));
       createThreadStat-> totalDelta = 0;
-      char* createThreadName = "Thread Creation Benchmark";
       createThreadStat->testName = createThreadName;
       createThreadBench(createThreadStat);
       printStats(createThreadStat, &conf);
       free(createThreadStat);
       if ( test > 0 ){ break; }
 
-    case 4:
-      conf.iterations = 10000;
-      ;// Testing process creation
+    case 4:;
+      char* createProcessName = "Process Creation Benchmark";
+      conf.iterations = 100000;
       Stat* createProcessStat = malloc(sizeof(Stat));
       createProcessStat->totalDelta = 0;
-      char* createProcessName = "Process Creation Benchmark";
       createProcessStat->testName = createProcessName;
       createProcessBench(createProcessStat);
       printStats(createProcessStat, &conf);
       free(createProcessStat);
       if ( test > 0 ){ break; }
 
-    case 5:
-      conf.iterations = 1000000;
-      ;// Testing process context switching
+    case 5:;
+      char* switchProcessName = "Process Context Switch Benchmark";
+      conf.iterations = 10000000;
       Stat* switchProcessStat = malloc(sizeof(Stat));
       switchProcessStat->totalDelta = 0;
-      char* switchProcessName = "Process Context Switch Benchmark";
       switchProcessStat->testName = switchProcessName;
       switchProcessBench(switchProcessStat);
       printStats(switchProcessStat, &conf);
       free(switchProcessStat);
       if ( test > 0 ){ break; }
 
-    case 6:
-      ;// Testing thread context switching
+    case 6:;
+      char* switchThreadName = "Thread Context Switch Benchmark";
+      conf.iterations = 10000000;
       Stat* switchThreadStat = malloc(sizeof(Stat));
       switchThreadStat->totalDelta = 0;
-      char* switchThreadName = "Thread Context Switch Benchmark";
       switchThreadStat->testName = switchThreadName;
       switchThreadBench(switchThreadStat);
       printStats(switchThreadStat, &conf);

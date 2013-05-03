@@ -12,3 +12,7 @@ io_bench
 *.swp
 *.swo
 .nfs*
+
+# Test files #
+##############
+lab4.input
