@@ -6,7 +6,19 @@ Lab4 Write Up: OS Measurement and Analysis
 
   Part 1
 
-1) Function Calls:
+1) Function Calls: `./os_bench 1` and `./os_bench 2`
+
+What we would like to measure here by calling system and non-system function calls is: how long does it take for a simple function call to execute. In the case of a non-system call, the process would be that of pushing the function onto the stack, executing the function, and pushing off the stack. In the case of a system function, the OS is trapped, the function executed, and control returned to the original program. For both of these, we want to simplify the functions called to reduce the overhead. Simple functions are the bane of a compiler, so to make sure the test code we write isn't tampered with we turn off compiler optimization in gcc with the -O0 flag (0 Optimization level).
+
+The Non-System function call simply increments a value and returns. In our experiment we start a timer, call the function, and clock the timer when the process returns to calling function. The experiment is repeated a large number (currently 10 million) times, and the results are averaged.
+
+The results are: Average time per test: 30.025314 ns/test
+
+The System function call simply times the  call `syscall(SYS_gettid)` a large number of times (currently 10 million), and averages the results. The system call we are invoiking is `SYS_gettid` which returns the pid_t id of the current thread. This is generally considered of the lightweight system calls.
+
+The results are: Average time per test: 67.311859 ns/test
+
+As we might expect, local function calls operate faster. 
 
 2) Task Creation
 
