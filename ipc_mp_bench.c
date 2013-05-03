@@ -3,13 +3,18 @@ Jeremy Bernstein and Travis Price
 CS 481 Spring 2013
 Lab 4 - OS Benchmarking
 */
+#define _GNU_SOURCE
 
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <sys/syscall.h>
+#include <sched.h>
+
 #include "stats.h"
+
 ////////////
 // Part 1 //
 ////////////
