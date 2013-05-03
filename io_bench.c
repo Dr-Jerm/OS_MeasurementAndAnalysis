@@ -39,21 +39,14 @@ void main( int argc, char **argv) {
 	printf("up and running\n");
 	buffer=(char*)malloc(i*sizeof(char));
 
-	while(fread(buffer,1,i,infile)); {
-		printf("%c\n",buffer[0]);
-	}
+	while(fread(buffer,1,i,infile));
 
 	rewind(infile);	
 
-	while(read(handle,buffer,i)); {
-		printf("%s\n",buffer);
-	}
+	while(read(handle,buffer,i));
 
 	lseek(handle,0,SEEK_SET);
 
-	if(map==MAP_FAILED)  {
-		printf("error while mapping\n");
-	}
  	memcpy(buffer,map,i);
 	printf("%s",buffer);
 	
