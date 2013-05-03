@@ -59,29 +59,6 @@ void sysFuncBench(Stat* stat){
   stat->endTime = timeNanoSec(&timer);
 }
 
-// Tiny function to time thread creation
-void *threadBench(){
-  pthread_exit(NULL);
-}
-
-// Benchmark for Thread Creation
-void createThreadBench(Stat* stat){
-  stat->startTime = timeNanoSec(&timer);
-  
-  int i;
-  for (i = 0; i < conf.iterations; i++){
-
-    long long unsigned startF = timeNanoSec(&timer);
-    pthread_t thread;
-    void *threadBench();
-
-    pthread_create(&thread, NULL, threadBench, NULL);
-    stat->totalDelta += timeNanoSec(&timer) - startF;
-    pthread_join(thread, NULL);
-  }
-
-  stat->endTime = timeNanoSec(&timer);
-}
 
 // Benchmark for Process Creation
 void createProcessBench(Stat* stat){
@@ -105,6 +82,32 @@ void createProcessBench(Stat* stat){
 //      exit(0);
       int wc = wait(NULL);
     }
+  }
+
+  stat->endTime = timeNanoSec(&timer);
+}
+
+
+// Tiny function to time thread creation
+void *threadBench(){
+  pthread_exit(NULL);
+}
+
+// Benchmark for Thread Creation
+void createThreadBench(Stat* stat){
+  stat->startTime = timeNanoSec(&timer);
+  
+  int i;
+  for (i = 0; i < conf.iterations; i++){
+
+    pthread_t thread;
+    void *threadBench();
+
+    long long unsigned startF = timeNanoSec(&timer);
+    pthread_create(&thread, NULL, threadBench, NULL);
+    stat->totalDelta += timeNanoSec(&timer) - startF;
+
+    pthread_join(thread, NULL);
   }
 
   stat->endTime = timeNanoSec(&timer);
@@ -261,17 +264,6 @@ void main( int argc, char **argv) {
       if ( test > 0 ){ break; }
 
     case 3:;
-      char* createThreadName = "Thread Creation Benchmark";
-      conf.iterations = 100000;
-      Stat* createThreadStat = malloc(sizeof(Stat));
-      createThreadStat-> totalDelta = 0;
-      createThreadStat->testName = createThreadName;
-      createThreadBench(createThreadStat);
-      printStats(createThreadStat, &conf);
-      free(createThreadStat);
-      if ( test > 0 ){ break; }
-
-    case 4:;
       char* createProcessName = "Process Creation Benchmark";
       conf.iterations = 100000;
       Stat* createProcessStat = malloc(sizeof(Stat));
@@ -280,6 +272,17 @@ void main( int argc, char **argv) {
       createProcessBench(createProcessStat);
       printStats(createProcessStat, &conf);
       free(createProcessStat);
+      if ( test > 0 ){ break; }
+
+    case 4:;
+      char* createThreadName = "Thread Creation Benchmark";
+      conf.iterations = 100000;
+      Stat* createThreadStat = malloc(sizeof(Stat));
+      createThreadStat-> totalDelta = 0;
+      createThreadStat->testName = createThreadName;
+      createThreadBench(createThreadStat);
+      printStats(createThreadStat, &conf);
+      free(createThreadStat);
       if ( test > 0 ){ break; }
 
     case 5:;

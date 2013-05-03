@@ -12,17 +12,42 @@ What we would like to measure here by calling system and non-system function cal
 
 The Non-System function call simply increments a value and returns. In our experiment we start a timer, call the function, and clock the timer when the process returns to calling function. The experiment is repeated a large number (currently 10 million) times, and the results are averaged.
 
-The results are: Average time per test: 30.025314 ns/test
+The results are: Average time per test: 29.025314 ns/test
 
 The System function call simply times the  call `syscall(SYS_gettid)` a large number of times (currently 10 million), and averages the results. The system call we are invoiking is `SYS_gettid` which returns the pid_t id of the current thread. This is generally considered of the lightweight system calls.
 
-The results are: Average time per test: 67.311859 ns/test
+The results are: Average time per test: 64.311859 ns/test
 
-As we might expect, local function calls operate faster. 
+As we might expect, local function calls operate faster. When a system call is executed, the OS is trapped, a lightweight context switch occurs, the command is executed by the OS, and the function returns. Naturally this is more complicated than just pushing a function onto the local processes' stack. However it is quite remarkable how optimized the system function call is. 
 
 2) Task Creation
 
+What we would like to measure here is the cost of creating a process and a thread respectivley. Recall that a process is created via fork() and has its own registers, address space, page table, etc. A thread on the other had has its own registers, but shares the address space and page table with it's parent. One might expect (correctly) that process creation is more complicated, and thus slower.
+
+The process creation experiment is run as follows: a timer is started, `fork()` is called, the parent thread continues into it's own block and stops the timer. The time captured reflects how long it takes for the OS to set up a new process via the `fork()` and then return control back to the parent process. The child process simply exits. This is repeated a large number of times (currently 100,000), and the results are averaged.
+
+The results are: Average time per test: 57520.558594 ns/test
+
+The thread creation experiment is run as follows: a timer is started, `pthread_create` is called to create a new process, the timer is stopped. This effectively captures how long it takes for a process to create a new thread. This is repeated a large number of times (currently 100,000), and the results are averaged.
+
+The results are: Average time per test: 7404.165039 ns/test
+
+As expected, thread creation is significantly faster than process creation. We initially implemented the test in a different manner, where the timer was stopped by the newly created thread/process. However we decided that this would not necissarily measure the time to create a function/thread, as we have no garuntee when that new thread/process will run.
+
 3) Context Switching
+
+What we would like to measure here is the cost of switching between two processes/threads. Recall the steps of a context switch: first the OS is either trapped into running, or it intervenes and halts a process. Next it stores the current values of the running process's registers into the Process Control Block so it can be restored later. The next process is loaded up and the register values from the PCB are inserted into the CPU. The new process begins execution. We would like to measure the time of this process, meaning we want to trigger timers right before the context switch happens, and immediatly again once the new process starts running.
+
+The Process Context Switch Benchmark is run as follows: pipes are created for the process to talk to the process it will switch to. The process is set to operate on one CPU using `sched_setaffinity` (child processes will inherit this). Next the parent process splits with `fork`. Begin loop: The child process blocks while waiting to read from a pipe to the parent. The parent starts it's timer and sends a message down to the child. The child, on recieving the message wakes up and stops the clock. The current time is then sent back to the parent so it can be logged. This process is repeated a large number (currently 10 million) of times and averaged.
+
+The results are: Average time per test: 1110.617432 ns/test
+
+The Thread Context Switch Benchmark is run as follows: The process (and thread once created) are set to run on the same processor. Next a thread is created with `pthread_create` and the child thread goes to sleep waiting for a signal from the parent. The parent runs, starting a timer, signals the child process, and goes to sleep. The child, upon recieveing the condition signal to awaken, stops the timer. This process is repeated a large number (currently 10 million) of times and averaged.
+
+The results are: Average time per test: 968.851868 ns/test
+
+Context switching between threads is slightly (insignificantly) faster than a process context switch. This might be caused by various forms of overhead revolving around a process context switch having it's own address space, and such as needing to flush the TLB.
+
 
 4) Extra Credit
 
@@ -41,6 +66,8 @@ As we might expect, local function calls operate faster.
 The Hypotheses
 
 9) Expected Performance of 'read', 'fread', and 'mmap/mmcpy'
+
+
 
 10) Increasing Strides for 'read'
 
