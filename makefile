@@ -5,6 +5,7 @@ CFLAGS = -O0 -o
 LFLAGS = -lrt
 PFLAGS = -pthread
 GFLAGS = -g
+MFLAGS = -lm
 all: $(EXECUTABLES)
 
 os_bench : stats.h os_bench.c util.c
@@ -17,7 +18,7 @@ ipc_shmem_bench : stats.h ipc_shmem_bench.c util.c
 	$(CC) $(CFLAGS) ipc_shmem_bench ipc_shmem_bench.c $(LFLAGS) $(PFLAGS) 
 
 io_bench : stats.h io_bench.c util.c
-	$(CC) $(CFLAGS) io_bench io_bench.c $(LFLAGS) $(GFLAGS)
+	$(CC) $(CFLAGS) io_bench io_bench.c $(LFLAGS) $(GFLAGS) $(MFLAGS)
 
 clean:
 	rm -f *.o $(EXECUTABLES)

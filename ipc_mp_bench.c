@@ -38,6 +38,11 @@ void main( int argc, char **argv) {
 	printf("error creating pipe\n");
   }
 
+  cpu_set_t mask;
+  CPU_ZERO(&mask);
+  CPU_SET(0, &mask);
+  sched_setaffinity(0, sizeof(mask), &mask);
+
   idp=fork();
   if(idp<0){
 	printf("fork failed\n");
