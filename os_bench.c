@@ -26,19 +26,19 @@ Conf conf;
 struct timespec timer;
 
 // Tiny function to test non-System Function call
-int tinyFunc(){
-  int i = 1;
-  return i;
+int tinyFunc(int i){
+  int j =  i + 1;
+  return j;
 }
 
 // Benchmark for non-System Function calls
 void nonSysFuncBench(Stat* stat){
   stat->startTime = timeNanoSec(&timer);
   
-  int i;
-  for (i = 0; i < conf.iterations; i++){
+  int i = 0;
+  while (i < conf.iterations){
     long long unsigned startF = timeNanoSec(&timer);
-    tinyFunc();
+    i =tinyFunc(i);
     stat->totalDelta += timeNanoSec(&timer) - startF;
   }
 
