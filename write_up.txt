@@ -1,0 +1,45 @@
+Jeremy Bernstein & Travis Price
+CS481 Operatting Systems
+Spring 2013
+
+Lab4 Write Up: OS Measurement and Analysis
+
+  Part 1
+
+1) Function Calls:
+
+2) Task Creation
+
+3) Context Switching
+
+4) Extra Credit
+
+  Part 2
+
+5) Multi-Threaded Program
+
+6) Multi-Process Program
+
+7) Measurements using 'time'
+
+8) Problems or deficiences with 'time'
+
+  Part 3
+
+The Hypotheses
+
+9) Expected Performance of 'read', 'fread', and 'mmap/mmcpy'
+
+10) Increasing Strides for 'read'
+
+11) Increasing Strides for 'fread'
+
+12) Increasing Strides for 'mmap/mmcpy'
+
+Experimental Results
+
+Raw Data:
+
+Results and Summary:
+
+Conclusions:

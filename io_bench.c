@@ -47,9 +47,9 @@ void iostat_print(ioStats* iostats, long long unsigned fsize)  {
 		printf("Size of read: %u \n ",iostats->readSize);
 		printf("	Total runtime: %llu  \n",elapsedTime);
 		printf("	Number of reads: %lli  \n",nreads);
-		printf("	time/read: %u \n ",iostats->readSize);
-		printf("	byte/time: %u  \n",iostats->readSize);
-		printf("	time/byte: %u  \n",iostats->readSize);
+		printf("	time/read: %f \n ",elapsedTime/(float)nreads);
+		printf("	byte/time: %f  \n",fsize/(float)elapsedTime);
+		printf("	time/byte: %f  \n",elapsedTime/(float)fsize);
 		printf("\n");
 		temp=iostats;
 		iostats=(ioStats*)iostats->next;
@@ -97,46 +97,46 @@ void main( int argc, char **argv) {
   
 
   while(i<=10000)  {
-	buffer=(char*)malloc(i*sizeof(char));
-	freadStats->readSize=i;
-	freadStats->startTime=timeNanoSec(&timer);
-	while(fread(buffer,1,i,infile));
-	freadStats->endTime=timeNanoSec(&timer);
-	if(i<10000){
-		freadStats->next=malloc(sizeof(ioStats));
-		freadStats=freadStats->next;
-	}
-	freadStats->next=NULL;
-	rewind(infile);
+    buffer=(char*)malloc(i*sizeof(char));
+    freadStats->readSize=i;
+    freadStats->startTime=timeNanoSec(&timer);
+    while(fread(buffer,1,i,infile));
+    freadStats->endTime=timeNanoSec(&timer);
+    if(i<10000){
+      freadStats->next=malloc(sizeof(ioStats));
+      freadStats=freadStats->next;
+    }
+    freadStats->next=NULL;
+    rewind(infile);
 
-	readStats->readSize=i;
-	readStats->startTime=timeNanoSec(&timer);
-	while(read(handle,buffer,i));
-	readStats->endTime=timeNanoSec(&timer);
-	if(i<10000){
-		readStats->next=malloc(sizeof(ioStats));
-		readStats=readStats->next;
-	}
-	readStats->next=NULL;
-	lseek(handle,0,SEEK_SET);
+    readStats->readSize=i;
+    readStats->startTime=timeNanoSec(&timer);
+    while(read(handle,buffer,i));
+    readStats->endTime=timeNanoSec(&timer);
+    if(i<10000){
+      readStats->next=malloc(sizeof(ioStats));
+      readStats=readStats->next;
+    }
+    readStats->next=NULL;
+    lseek(handle,0,SEEK_SET);
 
-	memcpyStats->readSize=i;
-	memcpyStats->startTime=timeNanoSec(&timer);
-	int j=0;
-	fmap=map;
-	for(j=0;j<=filesize;j+=i)  {
- 		memcpy(buffer,fmap,i);
-		fmap=fmap+i;
-	}
-	memcpyStats->endTime=timeNanoSec(&timer);
-	if(i<10000){
-		memcpyStats->next=malloc(sizeof(ioStats));
-		memcpyStats=memcpyStats->next;
-	}
-	memcpyStats->next=NULL;
+    memcpyStats->readSize=i;
+    memcpyStats->startTime=timeNanoSec(&timer);
+    int j=0;
+    fmap=map;
+    for(j=0;j<=filesize;j+=i)  {
+      memcpy(buffer,fmap,i);
+      fmap=fmap+i;
+    }
+    memcpyStats->endTime=timeNanoSec(&timer);
+    if(i<10000){
+      memcpyStats->next=malloc(sizeof(ioStats));
+      memcpyStats=memcpyStats->next;
+    }
+    memcpyStats->next=NULL;
 
-	i=i*10;
-	free(buffer);
+    i=i*10;
+    free(buffer);
   }
   if(munmap(map,filesize)==-1)  {
 		printf("error un-mapping file\n");
