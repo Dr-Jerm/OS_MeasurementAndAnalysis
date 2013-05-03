@@ -59,14 +59,8 @@ void sysFuncBench(Stat* stat){
   stat->endTime = timeNanoSec(&timer);
 }
 
-// Tiny struct to hold pthread input args
-typedef struct{
-  Stat* stat;
-  long long unsigned* startF;
-} Args;
-
 // Tiny function to time thread creation
-void *threadBench(Args* args){
+void *threadBench(){
   pthread_exit(NULL);
 }
 
@@ -76,15 +70,12 @@ void createThreadBench(Stat* stat){
   
   int i;
   for (i = 0; i < conf.iterations; i++){
-    Args args;
-    args.stat = stat;
 
     long long unsigned startF = timeNanoSec(&timer);
     pthread_t thread;
-    void *threadBench(Args* args);
-    args.startF = &startF;
+    void *threadBench();
 
-    pthread_create(&thread, NULL, threadBench, &args);
+    pthread_create(&thread, NULL, threadBench, NULL);
     stat->totalDelta += timeNanoSec(&timer) - startF;
     pthread_join(thread, NULL);
   }
@@ -179,15 +170,39 @@ void switchProcessBench(Stat* stat){
   stat->endTime = timeNanoSec(&timer);
 }
 
+pthread_cond_t cond;
+pthread_mutex_t mutex;
+
+// Tiny struct to hold pthread input args
+typedef struct{
+  Stat* stat;
+  long long unsigned* startF;
+} Args;
+
+// Tiny thread to test context switches with
+void *threadSwitchBench(){
+  pthread_exit(NULL);
+}
+
 // Benchmark for Thread context switching
 void switchThreadBench(Stat* stat){
   stat->startTime = timeNanoSec(&timer);
+
+  pthread_t thread;
+
+  pthread_create(&thread, NULL, threadSwitchBench, NULL);
+
   
   int i;
   for (i = 0; i < conf.iterations; i++){
+
     long long unsigned startF = timeNanoSec(&timer);
-    syscall(SYS_gettid); // does the system call for system ID
+    pthread_t thread;
+    void *threadBench();
+
+    pthread_create(&thread, NULL, threadBench, NULL);
     stat->totalDelta += timeNanoSec(&timer) - startF;
+    pthread_join(thread, NULL);
   }
 
   stat->endTime = timeNanoSec(&timer);
