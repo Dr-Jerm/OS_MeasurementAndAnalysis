@@ -46,7 +46,7 @@ void main( int argc, char **argv) {
 	close(fd0[1]);
 	char string[9];
 	string[9];
-	for(j=0;j<100000;j++)  {
+	for(j=0;j<10000000;j++)  {
 
 		for(i=0;i<128;i++)  {
 			read(fd0[0],string,8);
