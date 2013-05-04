@@ -19,8 +19,10 @@ Lab 4 - OS Benchmarking
 // Part 2 //
 ////////////
 
-
-
+struct timespec timer;
+long long unsigned startTime;
+long long unsigned total_px_time;
+long long unsigned total_read_time;
 
 void main( int argc, char **argv) {
   int idp;
@@ -59,12 +61,17 @@ void main( int argc, char **argv) {
 	close(fd0[1]);
 	char string[9];
 	string[9];
+	long long unsigned read_start;
+	long long unsigned read_finsih;
 	for(j=0;j<10000000;j++)  {
 
+		read_start=timeNanoSec(&timer);
 		for(i=0;i<128;i++)  {
+		
 			read(fd0[0],string,8);
 		}
 		write(fd1[1],data,1024);
+		read_finish=timeNanoSec(&timer);
 	}
 	exit(0);
   }  else  {
@@ -72,7 +79,8 @@ void main( int argc, char **argv) {
 	close(fd0[0]);
 	char pstring[9];
 	pstring[8]='\0';
-	
+	long long unsigned read_start;
+	long long unsigned read_finish;
 	for(j=0;j<100000;j++)  {
 		write(fd0[1],data,1024);
 		for(i=0;i<128;i++)  {
