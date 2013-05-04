@@ -4,8 +4,11 @@ CS 481 Spring 2013
 Lab 4 - OS Benchmarking
 */
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <pthread.h>
+#include <sched.h>
 #include "stats.h"
 #include "util.c"
 ////////////
@@ -31,6 +34,12 @@ void* passer(void* x)
 	int i;
 	char string[9];
 	long long unsigned read_start_time;
+
+	cpu_set_t mask;
+    CPU_ZERO(&mask);
+    CPU_SET(0, &mask);
+	sched_setaffinity(0, sizeof(mask), &mask);
+
     for(i=0;i<10000000;i++)  {
 		pthread_mutex_lock(&lock);
 		while(mainfull==0)  {
@@ -72,6 +81,12 @@ void main( int argc, char **argv) {
   pthread_t thread;
   long long start_read_time;
   int i;
+
+  cpu_set_t mask;
+  CPU_ZERO(&mask);
+  CPU_SET(0, &mask);
+  sched_setaffinity(0, sizeof(mask), &mask);
+
   for(i=0;i<1023;i++)  {
 		buffer[i]='a';
   }
