@@ -20,7 +20,8 @@ The results are: Average time per test: 64.311859 ns/test
 
 As we might expect, local function calls operate faster. When a system call is executed, the OS is trapped, a lightweight context switch occurs, the command is executed by the OS, and the function returns. Naturally this is more complicated than just pushing a function onto the local processes' stack. However it is quite remarkable how optimized the system function call is. 
 
-2) Task Creation
+
+2) Task Creation `./os_bench 3` and `./os_bench 4`
 
 What we would like to measure here is the cost of creating a process and a thread respectivley. Recall that a process is created via fork() and has its own registers, address space, page table, etc. A thread on the other had has its own registers, but shares the address space and page table with it's parent. One might expect (correctly) that process creation is more complicated, and thus slower.
 
@@ -34,7 +35,8 @@ The results are: Average time per test: 7404.165039 ns/test
 
 As expected, thread creation is significantly faster than process creation. We initially implemented the test in a different manner, where the timer was stopped by the newly created thread/process. However we decided that this would not necissarily measure the time to create a function/thread, as we have no garuntee when that new thread/process will run.
 
-3) Context Switching
+
+3) Context Switching `./os_bench 5` and `./os_bench 6`
 
 What we would like to measure here is the cost of switching between two processes/threads. Recall the steps of a context switch: first the OS is either trapped into running, or it intervenes and halts a process. Next it stores the current values of the running process's registers into the Process Control Block so it can be restored later. The next process is loaded up and the register values from the PCB are inserted into the CPU. The new process begins execution. We would like to measure the time of this process, meaning we want to trigger timers right before the context switch happens, and immediatly again once the new process starts running.
 
@@ -71,15 +73,132 @@ Based on some reading of man pages, and wikipedia pages, we hypothesize the foll
 
 10) Increasing Strides for 'read'
 
-
+We expect that read will increase in efficiency at first (reading ~1 byte at a time being quite inefficient), then level off (1000+ bytes) as the value read reaches a standard block size. 
 
 11) Increasing Strides for 'fread'
 
+`fread`'s performance should behave roughly like `read` only slightly slower.
+
 12) Increasing Strides for 'mmap/memcpy'
+
+`mmap/memcpy` will have to go to disk even if the physical memory has already been mapped, therefore it should stay fairly consistantly slow.
 
 Experimental Results
 
 Raw Data:
+
+
+Size of read: 1 
+  Total runtime: 1333123688  
+  Number of reads: 100000000  
+  time/read: 13.331237 
+  byte/time: 0.075012  
+  time/byte: 13.331237  
+
+Size of read: 10 
+  Total runtime: 137606057  
+  Number of reads: 10000000  
+  time/read: 13.760607 
+  byte/time: 0.726712  
+  time/byte: 1.376061  
+
+Size of read: 100 
+  Total runtime: 25758316  
+  Number of reads: 1000000  
+  time/read: 25.758316 
+  byte/time: 3.882241  
+  time/byte: 0.257583  
+
+Size of read: 1000 
+  Total runtime: 14287916  
+  Number of reads: 100000  
+  time/read: 142.879166 
+  byte/time: 6.998921  
+  time/byte: 0.142879  
+
+Size of read: 10000 
+  Total runtime: 11752101  
+  Number of reads: 10000  
+  time/read: 1175.210083 
+  byte/time: 8.509117  
+  time/byte: 0.117521  
+
+
+Results for read()
+
+Size of read: 1 
+  Total runtime: 14179403909  
+  Number of reads: 100000000  
+  time/read: 141.794037 
+  byte/time: 0.007052  
+  time/byte: 141.794037  
+
+Size of read: 10 
+  Total runtime: 1505690836  
+  Number of reads: 10000000  
+  time/read: 150.569092 
+  byte/time: 0.066415  
+  time/byte: 15.056909  
+
+Size of read: 100 
+  Total runtime: 174259435  
+  Number of reads: 1000000  
+  time/read: 174.259445 
+  byte/time: 0.573857  
+  time/byte: 1.742594  
+
+Size of read: 1000 
+  Total runtime: 22910067  
+  Number of reads: 100000  
+  time/read: 229.100677 
+  byte/time: 4.364893  
+  time/byte: 0.229101  
+
+Size of read: 10000 
+  Total runtime: 9905886  
+  Number of reads: 10000  
+  time/read: 990.588623 
+  byte/time: 10.095008  
+  time/byte: 0.099059  
+
+
+Results for mmap()/memcpy
+
+Size of read: 1 
+  Total runtime: 444940602  
+  Number of reads: 100000000  
+  time/read: 4.449406 
+  byte/time: 0.224749  
+  time/byte: 4.449406  
+
+Size of read: 10 
+  Total runtime: 46911686  
+  Number of reads: 10000000  
+  time/read: 4.691169 
+  byte/time: 2.131665  
+  time/byte: 0.469117  
+
+Size of read: 100 
+  Total runtime: 8194026  
+  Number of reads: 1000000  
+  time/read: 8.194026 
+  byte/time: 12.204013  
+  time/byte: 0.081940  
+
+Size of read: 1000 
+  Total runtime: 8837626  
+  Number of reads: 100000  
+  time/read: 88.376259 
+  byte/time: 11.315256  
+  time/byte: 0.088376  
+
+Size of read: 10000 
+  Total runtime: 6653943  
+  Number of reads: 10000  
+  time/read: 665.394287 
+  byte/time: 15.028683  
+  time/byte: 0.066539  
+
 
 Results and Summary:
 

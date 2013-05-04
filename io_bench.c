@@ -23,7 +23,7 @@ Lab 4 - OS Benchmarking
 #include "util.c"
 #include "stats.h"
 ////////////
-// Part 3 //
+// Part 2 //
 ////////////
 
 typedef struct {
