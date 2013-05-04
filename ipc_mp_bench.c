@@ -33,13 +33,6 @@ void main( int argc, char **argv) {
   long long unsigned data[128];
   int i;
   int j;
-	
-  for(i=0;i<1024;i++)  {
-	data[i]='a';
-	if(i==1023)  {
-		data[i]='b';
-	}
-  }
 
   
   if(pipe(fd1)<0)  {
