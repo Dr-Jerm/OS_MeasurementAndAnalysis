@@ -16,8 +16,11 @@ Lab 4 - OS Benchmarking
 #include "stats.h"
 
 ////////////
-// Part 1 //
+// Part 2 //
 ////////////
+
+
+
 
 void main( int argc, char **argv) {
   int idp;

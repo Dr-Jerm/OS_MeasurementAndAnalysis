@@ -8,7 +8,7 @@ Lab 4 - OS Benchmarking
 #include <pthread.h>
 #include "stats.h"
 ////////////
-// Part 1 //
+// Part 2 //
 ////////////
 
 pthread_mutex_t lock;
@@ -19,6 +19,11 @@ int i=10000;
 int mainfull=0;
 int passerfull=0;
 char* tempbuff;
+struct timespec timer;
+long long unsigned startTime;
+long long unsigned total_px_time;
+long long unsigned total_read_time;
+
 
 void* passer(void* x)
 {
@@ -34,6 +39,10 @@ void* passer(void* x)
 		char string[9];
 		int n=0;
 		tempbuff=buffer;
+
+		sscanf(tempbuff,"%8s",string);
+		n+=8;
+		tempbuff+=8;
 
 		while(n<1024)
 		{
