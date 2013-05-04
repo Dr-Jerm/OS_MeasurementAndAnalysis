@@ -81,7 +81,7 @@ void main( int argc, char **argv) {
   pthread_t thread;
   long long start_read_time;
   int i;
-
+  fflush(stdout);
   cpu_set_t mask;
   CPU_ZERO(&mask);
   CPU_SET(0, &mask);
