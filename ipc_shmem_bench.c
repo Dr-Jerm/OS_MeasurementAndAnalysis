@@ -112,8 +112,8 @@ void main( int argc, char **argv) {
 		total_px_time+=start_read_time-startTime;
 		
   }
-  printf("total process exchange time %llu\n",total_px_time);
-  printf("total read time %llu \n",total_read_time);
+  printf("total process exchange time %llu\n",(total_px_time/20000000));
+  printf("total read time %llu \n",(total_read_time/10000000));
 
   pthread_exit(NULL);
 }
