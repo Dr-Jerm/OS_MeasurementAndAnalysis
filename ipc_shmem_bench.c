@@ -29,7 +29,6 @@ long long unsigned startTime;
 long long unsigned total_px_time;
 long long unsigned total_read_time;
 
-
 void* passer(void* x)
 {
 	int i;
@@ -132,7 +131,7 @@ void main( int argc, char **argv) {
   printf("average process exchange time %llu\n",(total_px_time/20000000));
   printf("average read time %llu \n",(total_read_time/10000000));
   printf("total read time %llu \n",total_read_time);
-  printf("total runtime %llu \n", timeNanoSec(&timer)-startTime);
+  printf("total runtime %llu \n", timeNanoSec(&timer)-program_start);
 
   pthread_exit(NULL);
 }
