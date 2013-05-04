@@ -29,6 +29,8 @@ void main( int argc, char **argv) {
   
   int fd0[2];
   int fd1[2];
+  int fd2[2];
+  int fd3[3];
   char data[1024];
   int i;
   int j;
@@ -59,6 +61,8 @@ void main( int argc, char **argv) {
   }  else if(idp==0)  {
 	close(fd1[0]);
 	close(fd0[1]);
+	close(fd2[0]);
+	close(fd3[1]);
 	char string[9];
 	string[9];
 	long long unsigned read_start;
@@ -77,16 +81,19 @@ void main( int argc, char **argv) {
   }  else  {
 	close(fd1[1]);
 	close(fd0[0]);
+	close(fd2[1]);
+	close(fd3[0]);
 	char pstring[9];
 	pstring[8]='\0';
 	long long unsigned read_start;
 	long long unsigned read_finish;
 	for(j=0;j<100000;j++)  {
 		write(fd0[1],data,1024);
+		read_start=timeNanoSec(&timer);
 		for(i=0;i<128;i++)  {
 			read(fd1[0],pstring,8);
 		}
-
+		read_finish=timeNanoSec(&timer);
 	}
   }
 	
