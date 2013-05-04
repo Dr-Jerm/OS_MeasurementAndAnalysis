@@ -65,15 +65,17 @@ Context switching between threads is slightly (insignificantly) faster than a pr
 
 The Hypotheses
 
-9) Expected Performance of 'read', 'fread', and 'mmap/mmcpy'
+9) Expected Performance of 'read', 'fread', and 'mmap/memcpy'
 
-
+Based on some reading of man pages, and wikipedia pages, we hypothesize the following: read will be the fastest function, it will be faster than fread because fread introduces extra overhead that eventually calls a standard read. mmap comes in last, via wikipedia: "... initally file contents are not entirely read from disk and do not use pysical RAM at all. The actual reads from disk are performed in a "lazy" manner, after a specific location is accessed." 
 
 10) Increasing Strides for 'read'
 
+
+
 11) Increasing Strides for 'fread'
 
-12) Increasing Strides for 'mmap/mmcpy'
+12) Increasing Strides for 'mmap/memcpy'
 
 Experimental Results
 
