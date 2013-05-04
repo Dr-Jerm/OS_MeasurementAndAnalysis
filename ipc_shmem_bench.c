@@ -24,6 +24,7 @@ int mainfull=0;
 int passerfull=0;
 char* tempbuff;
 struct timespec timer;
+long long unsigned program_start;
 long long unsigned startTime;
 long long unsigned total_px_time;
 long long unsigned total_read_time;
@@ -77,7 +78,7 @@ void* passer(void* x)
 	pthread_exit(NULL);
 }
 void main( int argc, char **argv) {
-  startTime=timeNanoSec(&timer);
+  program_start=timeNanoSec(&timer);
   buffer[1023]='\0';
   pthread_t thread;
   long long start_read_time;

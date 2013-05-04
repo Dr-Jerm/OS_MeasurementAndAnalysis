@@ -57,12 +57,12 @@ void main( int argc, char **argv) {
 	long long unsigned placeholder;
 	long long unsigned read_start;
 	long long unsigned read_finsih;
-	for(j=0;j<10000000;j++)  {
+	for(j=0;j<100;j++)  {
 
-		read(fd0[0],placeholder,8);
+		read(fd0[0],&placeholder,8);
 		data[0]=timeNanoSec(&timer);//take the time after the first read operationg
 		for(i=0;i<127;i++)  {
-			read(fd0[0],placeholder,8);
+			read(fd0[0],&placeholder,8);
 		}
 		data[127]=timeNanoSec(&timer);
 		write(fd1[1],data,1024);
@@ -79,24 +79,25 @@ void main( int argc, char **argv) {
 	long long unsigned child_start;
 	long long unsigned child_finish;
 	long long unsigned read_finish;
-	for(j=0;j<100000;j++)  {
+	for(j=0;j<100;j++)  {
 		write_start=timeNanoSec(&timer);
 		write(fd0[1],data,1024);
-		read(fd1[0],child_start,8);
+		read(fd1[0],&child_start,8);
+		read_start=timeNanoSec(&timer);
 		for(i=0;i<127;i++)  {
-			read(fd1[0],child_finish,8);
+			read(fd1[0],&child_finish,8);
 		}
 		read_finish=timeNanoSec(&timer);
 		total_read_time+=child_finish-child_start;
 		total_read_time+=read_finish-read_start;
+	
 		total_px_time+=child_start-write_start;
-		total_px_time+=child_finish-read_start;
+		total_px_time+=read_start-child_finish;
 	}
   }
-  finishTime=timeNanoSec(&timer);
-  printf("Total runtime: %llu\n",finishTime-startTime);
+  printf("Total runtime: %llu\n",timeNanoSec(&timer)-startTime);
   printf("Total time striding buffer: %llu\n",total_read_time);
-  printf("Average time striding buffer: %llu\n",total_read_time/20000000);
-  printf("Average process exchange time: %llu\n",total_px_time/20000000);
+  printf("Average time striding buffer: %llu\n",total_read_time/200);
+  printf("Average process exchange time: %llu\n",total_px_time/200);
   
 }
