@@ -57,7 +57,7 @@ void main( int argc, char **argv) {
 	long long unsigned placeholder;
 	long long unsigned read_start;
 	long long unsigned read_finsih;
-	for(j=0;j<10000000;j++)  {
+	for(j=0;j<100000;j++)  {
 
 		read(fd0[0],&placeholder,8);
 		data[0]=timeNanoSec(&timer);//take the time after the first read operationg
@@ -79,7 +79,7 @@ void main( int argc, char **argv) {
 	long long unsigned child_start;
 	long long unsigned child_finish;
 	long long unsigned read_finish;
-	for(j=0;j<10000000;j++)  {
+	for(j=0;j<100000;j++)  {
 		write_start=timeNanoSec(&timer);
 		write(fd0[1],data,1024);
 		read(fd1[0],&child_start,8);
@@ -97,7 +97,7 @@ void main( int argc, char **argv) {
   }
   printf("Total runtime: %llu\n",timeNanoSec(&timer)-startTime);
   printf("Total time striding buffer: %llu\n",total_read_time);
-  printf("Average time striding buffer: %llu\n",total_read_time/20000000);
-  printf("Average process exchange time: %llu\n",total_px_time/20000000);
+  printf("Average time striding buffer: %llu\n",total_read_time/200000);
+  printf("Average process exchange time: %llu\n",total_px_time/200000);
   
 }
