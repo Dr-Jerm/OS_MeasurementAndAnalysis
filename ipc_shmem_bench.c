@@ -77,6 +77,7 @@ void* passer(void* x)
 	pthread_exit(NULL);
 }
 void main( int argc, char **argv) {
+  startTime=timeNanoSec(&timer);
   buffer[1023]='\0';
   pthread_t thread;
   long long start_read_time;
@@ -129,6 +130,7 @@ void main( int argc, char **argv) {
   }
   printf("total process exchange time %llu\n",(total_px_time/20000000));
   printf("total read time %llu \n",(total_read_time/10000000));
+  printf("total runtime %llu \n", timeNanoSec(&timer)-startTime);
 
   pthread_exit(NULL);
 }
