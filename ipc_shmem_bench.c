@@ -7,6 +7,7 @@ Lab 4 - OS Benchmarking
 #include <stdio.h>
 #include <pthread.h>
 #include "stats.h"
+#include "util.c"
 ////////////
 // Part 2 //
 ////////////
@@ -28,6 +29,8 @@ long long unsigned total_read_time;
 void* passer(void* x)
 {
 	int i;
+	char string[9];
+	long long unsigned read_start_time;
     for(i=0;i<10000000;i++)  {
 		pthread_mutex_lock(&lock);
 		while(mainfull==0)  {
@@ -36,10 +39,12 @@ void* passer(void* x)
 		mainfull=0;
 		pthread_mutex_unlock(&lock);
 		
-		char string[9];
+		
 		int n=0;
 		tempbuff=buffer;
 
+		
+		read_start_time=timeNanoSec(&timer);
 		sscanf(tempbuff,"%8s",string);
 		n+=8;
 		tempbuff+=8;
@@ -51,8 +56,12 @@ void* passer(void* x)
 			tempbuff+=8;
 		}
 	
+		total_read_time+=timeNanoSec(&timer)-read_start_time;
+		total_px_time+=read_start_time-startTime;
+
 		pthread_mutex_lock(&lock);
 		passerfull=1;
+		startTime = timeNanoSec(&timer);
 		pthread_cond_signal(&passerSig);
 		pthread_mutex_unlock(&lock);
     }
@@ -61,7 +70,7 @@ void* passer(void* x)
 void main( int argc, char **argv) {
   buffer[1023]='\0';
   pthread_t thread;
-
+  long long start_read_time;
   int i;
   for(i=0;i<1023;i++)  {
 		buffer[i]='a';
@@ -69,32 +78,42 @@ void main( int argc, char **argv) {
 
   int rc;
   int t=1;
+  char string[9];
   rc=pthread_create(&thread,NULL,passer,(void*)t);
 
   for(i=0;i<10000000;i++)  {
 	pthread_mutex_lock(&lock);
 	mainfull=1;
+    startTime = timeNanoSec(&timer);
 	pthread_cond_signal(&mainSig);
 	pthread_mutex_unlock(&lock);
 
-	char string[9];
-	int n=0;
-	tempbuff=buffer;
+	pthread_mutex_lock(&lock);
+	while(passerfull==0)  {
+		pthread_cond_wait(&passerSig,&lock);
+	}
+	passerfull=0;
+	pthread_mutex_unlock(&lock);
 
-	while(n<1024)
-	{
+		int n=0;
+		
+		start_read_time=timeNanoSec(&timer);
 		sscanf(tempbuff,"%8s",string);
 		n+=8;
 		tempbuff+=8;
-	}
 
-	pthread_mutex_lock(&lock);
-		while(passerfull==0)  {
-			pthread_cond_wait(&passerSig,&lock);
+		while(n<1024)
+		{
+			sscanf(tempbuff,"%8s",string);
+			n+=8;
+			tempbuff+=8;
 		}
-		passerfull=0;
-		pthread_mutex_unlock(&lock);
+		total_read_time+=timeNanoSec(&timer)-start_read_time;
+		total_px_time+=start_read_time-startTime;
+		
   }
+  printf("total process exchange time %llu\n",total_px_time);
+  printf("total read time %llu \n",total_read_time);
 
   pthread_exit(NULL);
 }
