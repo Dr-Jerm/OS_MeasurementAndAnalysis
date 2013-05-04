@@ -202,4 +202,14 @@ Size of read: 10000
 
 Results and Summary:
 
+Graphs go here
+
 Conclusions:
+
+In short: we were wrong. `mmap/memcpy` was the fastest. We overlooked the functionality of `memcpy` when making our hypothesis. Why was it consistantly faster? While `mmap` doesn't load an entire file at once, it maps it to memory allowing the application to treat the entire file content as accessable. Because the whole file has been mapped to the virtual address space (it is all accessable) it requires less overhead for the subsequent reads, ie. less system calls than functions like `read` and `fread`
+
+Now, as for `fread` being faster than vanilla read. Well, the answer is easily derived. What could the extra overhead inside of a function possibly be doing to justify it's existance? Yea, optimizing how it reads.`read` is a very low level system call. `fread` provides a buffer for its reads.
+
+The next questions is, why does it appear that `read` has better performance than `fread` at large read sizes? Well, one online poster described how `fread` works as follows: "... `fread` typically does just one `read` to suck up a whole bunch of data, which it then dribbles out to you byte by byte as you ask for it, and doesn't do another `read` until you've drained all the bytes from the first one." This might suggest that on larger reads, the fread dumps the contents of it's registers every time, and the fact that it has the overhead in place to help with the "dribbling" catches up to it in terms of performance.
+
+In conclusion it appears that `mmap/memcpy` is the way to go (although alot of online posters claim that it can be unstable/tricky to use). If your set on using a read function `fread` will get the job done best "most" of the time. On the other hand, when reading huge chunks at a time, and you don't want ot use `mmap/memcpy`, then a vanilla `read` will likely be the best choice.
